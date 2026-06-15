@@ -11,23 +11,11 @@
   <style>
     .admin-wrapper { max-width: 1100px; margin: 50px auto; padding: 0 30px; }
     .admin-tabs { display: flex; gap: 10px; margin-bottom: 35px; }
-    .tab-btn {
-      padding: 12px 28px; border: 2px solid var(--border);
-      background: #fff; border-radius: 50px; cursor: pointer;
-      font-size: 14px; font-weight: 600; font-family: 'Poppins', sans-serif;
-      color: var(--text-light); transition: all 0.3s;
-    }
-    .tab-btn.active {
-      background: var(--gradient); border-color: transparent;
-      color: #fff; box-shadow: 0 5px 20px rgba(108,99,255,0.3);
-    }
+    .tab-btn { padding: 12px 28px; border: 2px solid var(--border); background: #fff; border-radius: 50px; cursor: pointer; font-size: 14px; font-weight: 600; font-family: 'Poppins', sans-serif; color: var(--text-light); transition: all 0.3s; }
+    .tab-btn.active { background: var(--gradient); border-color: transparent; color: #fff; box-shadow: 0 5px 20px rgba(108,99,255,0.3); }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
-    .admin-card {
-      background: #fff; border-radius: 20px; padding: 35px;
-      box-shadow: 0 2px 15px rgba(0,0,0,0.05);
-      border: 1px solid rgba(0,0,0,0.04); margin-bottom: 30px;
-    }
+    .admin-card { background: #fff; border-radius: 20px; padding: 35px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.04); margin-bottom: 30px; }
     .admin-card h3 { font-size: 20px; font-weight: 800; color: var(--dark2); margin-bottom: 25px; letter-spacing: -0.5px; }
     .product-row { display: flex; align-items: center; gap: 18px; padding: 16px 0; border-bottom: 1px solid var(--border); }
     .product-row:last-child { border-bottom: none; }
@@ -37,6 +25,8 @@
     .product-row-info p { font-size: 13px; color: var(--text-light); margin-top: 3px; }
     .delete-btn { background: rgba(255,101,132,0.1); color: var(--secondary); border: 1px solid rgba(255,101,132,0.3); padding: 8px 16px; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.3s; font-family: 'Poppins', sans-serif; }
     .delete-btn:hover { background: var(--secondary); color: #fff; }
+    .edit-btn { background: rgba(108,99,255,0.1); color: var(--primary); border: 1px solid rgba(108,99,255,0.2); padding: 8px 16px; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.3s; font-family: 'Poppins', sans-serif; margin-right: 8px; }
+    .edit-btn:hover { background: var(--primary); color: #fff; }
     .order-row { padding: 18px 0; border-bottom: 1px solid var(--border); }
     .order-row:last-child { border-bottom: none; }
     .order-row-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
@@ -51,6 +41,9 @@
     .stat-card:nth-child(3) { background: linear-gradient(135deg, #43e97b, #0ea5e9); box-shadow: 0 10px 30px rgba(67,233,123,0.35); }
     .stat-card .stat-num { font-size: 42px; font-weight: 900; color: #fff; }
     .stat-card .stat-label { font-size: 13px; color: rgba(255,255,255,0.8); font-weight: 600; margin-top: 5px; }
+    .edit-input { width: 100%; padding: 12px; border: 2px solid rgba(255,255,255,0.15); border-radius: 10px; background: rgba(255,255,255,0.08); color: #fff; font-family: 'Poppins', sans-serif; outline: none; margin-top: 5px; font-size: 14px; }
+    .edit-input:focus { border-color: var(--primary); }
+    .edit-label { color: rgba(255,255,255,0.7); font-size: 13px; font-weight: 600; }
   </style>
 </head>
 <body>
@@ -72,102 +65,29 @@
   <div class="admin-wrapper">
     <h2 style="font-size:32px; font-weight:900; color:var(--dark2); margin-bottom:30px; letter-spacing:-1px;">⚙️ Admin Dashboard</h2>
 
-    <!-- Stats -->
     <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-num" id="stat-products">-</div>
-        <div class="stat-label">Total Products</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num" id="stat-orders">-</div>
-        <div class="stat-label">Total Orders</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num" id="stat-revenue">-</div>
-        <div class="stat-label">Total Revenue</div>
-      </div>
+      <div class="stat-card"><div class="stat-num" id="stat-products">-</div><div class="stat-label">Total Products</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-orders">-</div><div class="stat-label">Total Orders</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-revenue">-</div><div class="stat-label">Total Revenue</div></div>
     </div>
 
-    <!-- Tabs -->
     <div class="admin-tabs">
-      <button class="tab-btn active" onclick="switchTab('products', this)">
-        <i class="fas fa-box"></i> Products
-      </button>
-      <button class="tab-btn" onclick="switchTab('orders', this)">
-        <i class="fas fa-shopping-bag"></i> Orders
-      </button>
-      <button class="tab-btn" onclick="switchTab('categories', this)">
-  <i class="fas fa-tags"></i> Categories
-</button>
-<button class="tab-btn" onclick="switchTab('coupons', this)">
-  <i class="fas fa-ticket-alt"></i> Coupons
-</button>
+      <button class="tab-btn active" onclick="switchTab('products', this)"><i class="fas fa-box"></i> Products</button>
+      <button class="tab-btn" onclick="switchTab('orders', this)"><i class="fas fa-shopping-bag"></i> Orders</button>
+      <button class="tab-btn" onclick="switchTab('categories', this)"><i class="fas fa-tags"></i> Categories</button>
+      <button class="tab-btn" onclick="switchTab('coupons', this)"><i class="fas fa-ticket-alt"></i> Coupons</button>
     </div>
-<!-- Coupons Tab -->
-<div class="tab-content" id="tab-coupons">
-  <div class="admin-card">
-    <h3>🎟️ Add New Coupon</h3>
-    <div id="coupon-alert"></div>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px">
-      <div class="form-group">
-        <label>Coupon Code</label>
-        <input type="text" id="coupon-code" placeholder="e.g. SAVE20" style="text-transform:uppercase"/>
-      </div>
-      <div class="form-group">
-        <label>Discount Type</label>
-        <select id="coupon-type" style="width:100%; padding:14px 18px; border:2px solid var(--border); border-radius:12px; font-size:14px; font-family:'Poppins',sans-serif; outline:none; background:#fafafa;">
-          <option value="percentage">Percentage (%)</option>
-          <option value="fixed">Fixed ($)</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Discount Value</label>
-        <input type="number" id="coupon-value" placeholder="e.g. 20" />
-      </div>
-      <div class="form-group">
-        <label>Min Order ($)</label>
-        <input type="number" id="coupon-min" placeholder="0" />
-      </div>
-      <div class="form-group">
-        <label>Max Uses</label>
-        <input type="number" id="coupon-maxuses" placeholder="100" />
-      </div>
-      <div class="form-group">
-        <label>Expiry Date</label>
-        <input type="date" id="coupon-expiry" />
-      </div>
-    </div>
-    <button class="btn-primary" onclick="addCoupon()">
-      <i class="fas fa-plus"></i> Add Coupon
-    </button>
-  </div>
-  <div class="admin-card">
-    <h3>🎟️ All Coupons</h3>
-    <div id="admin-coupons"></div>
-  </div>
-</div>
+
     <!-- Products Tab -->
     <div class="tab-content active" id="tab-products">
       <div class="admin-card">
         <h3>➕ Add New Product</h3>
         <div id="alert-box"></div>
-        <div class="form-group">
-          <label>Product Name</label>
-          <input type="text" id="name" placeholder="Enter product name" />
-        </div>
-        <div class="form-group">
-          <label>Description</label>
-          <input type="text" id="description" placeholder="Enter description" />
-        </div>
+        <div class="form-group"><label>Product Name</label><input type="text" id="name" placeholder="Enter product name" /></div>
+        <div class="form-group"><label>Description</label><input type="text" id="description" placeholder="Enter description" /></div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px">
-          <div class="form-group">
-            <label>Price ($)</label>
-            <input type="number" id="price" placeholder="0.00" />
-          </div>
-          <div class="form-group">
-            <label>Stock</label>
-            <input type="number" id="stock" placeholder="0" />
-          </div>
+          <div class="form-group"><label>Price ($)</label><input type="number" id="price" placeholder="0.00" /></div>
+          <div class="form-group"><label>Stock</label><input type="number" id="stock" placeholder="0" /></div>
         </div>
         <div class="form-group">
           <label>Category</label>
@@ -175,13 +95,51 @@
             <option value="">Select Category</option>
           </select>
         </div>
+        <div class="form-group"><label>Main Image URL</label><input type="text" id="image" placeholder="https://..." /></div>
         <div class="form-group">
-          <label>Image URL</label>
-          <input type="text" id="image" placeholder="https://..." />
+          <label>Additional Images (one URL per line)</label>
+          <textarea id="extra-images" placeholder="https://image2.com&#10;https://image3.com" style="width:100%; padding:14px 18px; border:2px solid var(--border); border-radius:12px; font-size:14px; font-family:'Poppins',sans-serif; outline:none; background:#fafafa; resize:vertical; min-height:100px;"></textarea>
         </div>
-        <button class="btn-primary" onclick="addProduct()">
-          <i class="fas fa-plus"></i> Add Product
-        </button>
+        <div class="form-group">
+          <label>Sizes</label>
+          <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:8px;">
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" value="XS" class="size-checkbox" style="width:16px; height:16px; accent-color:var(--primary);"/><span style="font-size:13px; font-weight:600;">XS</span></label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" value="S" class="size-checkbox" style="width:16px; height:16px; accent-color:var(--primary);"/><span style="font-size:13px; font-weight:600;">S</span></label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" value="M" class="size-checkbox" style="width:16px; height:16px; accent-color:var(--primary);"/><span style="font-size:13px; font-weight:600;">M</span></label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" value="L" class="size-checkbox" style="width:16px; height:16px; accent-color:var(--primary);"/><span style="font-size:13px; font-weight:600;">L</span></label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" value="XL" class="size-checkbox" style="width:16px; height:16px; accent-color:var(--primary);"/><span style="font-size:13px; font-weight:600;">XL</span></label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" value="XXL" class="size-checkbox" style="width:16px; height:16px; accent-color:var(--primary);"/><span style="font-size:13px; font-weight:600;">XXL</span></label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" value="One Size" class="size-checkbox" style="width:16px; height:16px; accent-color:var(--primary);"/><span style="font-size:13px; font-weight:600;">One Size</span></label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" value="36" class="size-checkbox" style="width:16px; height:16px; accent-color:var(--primary);"/><span style="font-size:13px; font-weight:600;">36</span></label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" value="37" class="size-checkbox" style="width:16px; height:16px; accent-color:var(--primary);"/><span style="font-size:13px; font-weight:600;">37</span></label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" value="38" class="size-checkbox" style="width:16px; height:16px; accent-color:var(--primary);"/><span style="font-size:13px; font-weight:600;">38</span></label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" value="39" class="size-checkbox" style="width:16px; height:16px; accent-color:var(--primary);"/><span style="font-size:13px; font-weight:600;">39</span></label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" value="40" class="size-checkbox" style="width:16px; height:16px; accent-color:var(--primary);"/><span style="font-size:13px; font-weight:600;">40</span></label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" value="41" class="size-checkbox" style="width:16px; height:16px; accent-color:var(--primary);"/><span style="font-size:13px; font-weight:600;">41</span></label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" value="42" class="size-checkbox" style="width:16px; height:16px; accent-color:var(--primary);"/><span style="font-size:13px; font-weight:600;">42</span></label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" value="43" class="size-checkbox" style="width:16px; height:16px; accent-color:var(--primary);"/><span style="font-size:13px; font-weight:600;">43</span></label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" value="44" class="size-checkbox" style="width:16px; height:16px; accent-color:var(--primary);"/><span style="font-size:13px; font-weight:600;">44</span></label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" value="45" class="size-checkbox" style="width:16px; height:16px; accent-color:var(--primary);"/><span style="font-size:13px; font-weight:600;">45</span></label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Colors</label>
+          <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:8px;">
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" value="Black" class="color-checkbox" style="width:16px; height:16px;"/><span style="display:flex; align-items:center; gap:5px; font-size:13px; font-weight:600;"><span style="width:16px; height:16px; border-radius:50%; background:#000; display:inline-block; border:2px solid #ddd;"></span>Black</span></label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" value="White" class="color-checkbox" style="width:16px; height:16px;"/><span style="display:flex; align-items:center; gap:5px; font-size:13px; font-weight:600;"><span style="width:16px; height:16px; border-radius:50%; background:#fff; display:inline-block; border:2px solid #ddd;"></span>White</span></label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" value="Red" class="color-checkbox" style="width:16px; height:16px;"/><span style="display:flex; align-items:center; gap:5px; font-size:13px; font-weight:600;"><span style="width:16px; height:16px; border-radius:50%; background:#e74c3c; display:inline-block; border:2px solid #ddd;"></span>Red</span></label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" value="Blue" class="color-checkbox" style="width:16px; height:16px;"/><span style="display:flex; align-items:center; gap:5px; font-size:13px; font-weight:600;"><span style="width:16px; height:16px; border-radius:50%; background:#3498db; display:inline-block; border:2px solid #ddd;"></span>Blue</span></label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" value="Green" class="color-checkbox" style="width:16px; height:16px;"/><span style="display:flex; align-items:center; gap:5px; font-size:13px; font-weight:600;"><span style="width:16px; height:16px; border-radius:50%; background:#2ecc71; display:inline-block; border:2px solid #ddd;"></span>Green</span></label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" value="Yellow" class="color-checkbox" style="width:16px; height:16px;"/><span style="display:flex; align-items:center; gap:5px; font-size:13px; font-weight:600;"><span style="width:16px; height:16px; border-radius:50%; background:#f1c40f; display:inline-block; border:2px solid #ddd;"></span>Yellow</span></label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" value="Pink" class="color-checkbox" style="width:16px; height:16px;"/><span style="display:flex; align-items:center; gap:5px; font-size:13px; font-weight:600;"><span style="width:16px; height:16px; border-radius:50%; background:#ff6584; display:inline-block; border:2px solid #ddd;"></span>Pink</span></label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" value="Purple" class="color-checkbox" style="width:16px; height:16px;"/><span style="display:flex; align-items:center; gap:5px; font-size:13px; font-weight:600;"><span style="width:16px; height:16px; border-radius:50%; background:#9b59b6; display:inline-block; border:2px solid #ddd;"></span>Purple</span></label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" value="Orange" class="color-checkbox" style="width:16px; height:16px;"/><span style="display:flex; align-items:center; gap:5px; font-size:13px; font-weight:600;"><span style="width:16px; height:16px; border-radius:50%; background:#e67e22; display:inline-block; border:2px solid #ddd;"></span>Orange</span></label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" value="Gray" class="color-checkbox" style="width:16px; height:16px;"/><span style="display:flex; align-items:center; gap:5px; font-size:13px; font-weight:600;"><span style="width:16px; height:16px; border-radius:50%; background:#95a5a6; display:inline-block; border:2px solid #ddd;"></span>Gray</span></label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" value="Brown" class="color-checkbox" style="width:16px; height:16px;"/><span style="display:flex; align-items:center; gap:5px; font-size:13px; font-weight:600;"><span style="width:16px; height:16px; border-radius:50%; background:#8B4513; display:inline-block; border:2px solid #ddd;"></span>Brown</span></label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" value="Beige" class="color-checkbox" style="width:16px; height:16px;"/><span style="display:flex; align-items:center; gap:5px; font-size:13px; font-weight:600;"><span style="width:16px; height:16px; border-radius:50%; background:#f5f0e8; display:inline-block; border:2px solid #ddd;"></span>Beige</span></label>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="addProduct()"><i class="fas fa-plus"></i> Add Product</button>
       </div>
       <div class="admin-card">
         <h3>📦 All Products</h3>
@@ -203,28 +161,45 @@
         <h3>➕ Add New Category</h3>
         <div id="cat-alert"></div>
         <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:15px">
-          <div class="form-group">
-            <label>Category Name</label>
-            <input type="text" id="cat-name" placeholder="e.g. Electronics" />
-          </div>
-          <div class="form-group">
-            <label>Icon (emoji)</label>
-            <input type="text" id="cat-icon" placeholder="e.g. 📱" />
-          </div>
-          <div class="form-group">
-            <label>Image URL</label>
-            <input type="text" id="cat-image" placeholder="https://..." />
-          </div>
+          <div class="form-group"><label>Category Name</label><input type="text" id="cat-name" placeholder="e.g. Electronics" /></div>
+          <div class="form-group"><label>Icon (emoji)</label><input type="text" id="cat-icon" placeholder="e.g. 📱" /></div>
+          <div class="form-group"><label>Image URL</label><input type="text" id="cat-image" placeholder="https://..." /></div>
         </div>
-        <button class="btn-primary" onclick="addCategory()">
-          <i class="fas fa-plus"></i> Add Category
-        </button>
+        <button class="btn-primary" onclick="addCategory()"><i class="fas fa-plus"></i> Add Category</button>
       </div>
       <div class="admin-card">
         <h3>🏷️ All Categories</h3>
         <div id="admin-categories"></div>
       </div>
     </div>
+
+    <!-- Coupons Tab -->
+    <div class="tab-content" id="tab-coupons">
+      <div class="admin-card">
+        <h3>🎟️ Add New Coupon</h3>
+        <div id="coupon-alert"></div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px">
+          <div class="form-group"><label>Coupon Code</label><input type="text" id="coupon-code" placeholder="e.g. SAVE20" style="text-transform:uppercase"/></div>
+          <div class="form-group">
+            <label>Discount Type</label>
+            <select id="coupon-type" style="width:100%; padding:14px 18px; border:2px solid var(--border); border-radius:12px; font-size:14px; font-family:'Poppins',sans-serif; outline:none; background:#fafafa;">
+              <option value="percentage">Percentage (%)</option>
+              <option value="fixed">Fixed ($)</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Discount Value</label><input type="number" id="coupon-value" placeholder="e.g. 20" /></div>
+          <div class="form-group"><label>Min Order ($)</label><input type="number" id="coupon-min" placeholder="0" /></div>
+          <div class="form-group"><label>Max Uses</label><input type="number" id="coupon-maxuses" placeholder="100" /></div>
+          <div class="form-group"><label>Expiry Date</label><input type="date" id="coupon-expiry" /></div>
+        </div>
+        <button class="btn-primary" onclick="addCoupon()"><i class="fas fa-plus"></i> Add Coupon</button>
+      </div>
+      <div class="admin-card">
+        <h3>🎟️ All Coupons</h3>
+        <div id="admin-coupons"></div>
+      </div>
+    </div>
+
   </div>
 
   <footer><p>© 2025 ShopZone. All rights reserved.</p></footer>
@@ -238,7 +213,7 @@
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
       btn.classList.add('active');
-      document.getElementById(`tab-${tab}`).classList.add('active');
+      document.getElementById('tab-' + tab).classList.add('active');
       if (tab === 'orders') loadAdminOrders();
       if (tab === 'categories') loadAdminCategories();
       if (tab === 'coupons') loadAdminCoupons();
@@ -249,9 +224,13 @@
       const description = document.getElementById('description').value;
       const price = document.getElementById('price').value;
       const image = document.getElementById('image').value;
+      const extraImages = document.getElementById('extra-images').value;
+      const images = [image, ...extraImages.split('\n').map(s => s.trim()).filter(s => s)];
       const category = document.getElementById('category').value;
       const stock = document.getElementById('stock').value;
       const alertBox = document.getElementById('alert-box');
+      const sizes = [...document.querySelectorAll('.size-checkbox:checked')].map(cb => cb.value);
+      const colors = [...document.querySelectorAll('.color-checkbox:checked')].map(cb => cb.value);
 
       if (!name || !description || !price || !image || !category || !stock) {
         alertBox.innerHTML = '<div class="alert alert-error">Please fill all fields</div>';
@@ -259,10 +238,8 @@
       }
 
       const res = await apiCall('/api/products', 'POST', {
-        name, description,
-        price: parseFloat(price),
-        image, category,
-        stock: parseInt(stock)
+        name, description, price: parseFloat(price),
+        image, images, sizes, colors, category, stock: parseInt(stock)
       });
 
       if (res._id) {
@@ -273,10 +250,51 @@
         document.getElementById('image').value = '';
         document.getElementById('category').value = '';
         document.getElementById('stock').value = '';
+        document.getElementById('extra-images').value = '';
+        document.querySelectorAll('.size-checkbox').forEach(cb => cb.checked = false);
+        document.querySelectorAll('.color-checkbox').forEach(cb => cb.checked = false);
         loadAdminProducts();
         loadStats();
       } else {
-        alertBox.innerHTML = `<div class="alert alert-error">${res.message}</div>`;
+        alertBox.innerHTML = '<div class="alert alert-error">' + res.message + '</div>';
+      }
+    }
+
+    function editProduct(id, name, description, price, stock) {
+      const overlay = document.createElement('div');
+      overlay.className = 'modal-overlay';
+      overlay.innerHTML =
+        '<div class="modal-box" style="max-width:500px; text-align:left;">' +
+        '<h3 style="color:#fff; margin-bottom:20px; font-size:18px; font-weight:800;">✏️ Edit Product</h3>' +
+        '<div style="margin-bottom:15px;"><label class="edit-label">Name</label><input id="edit-name" class="edit-input" value="' + name + '"/></div>' +
+        '<div style="margin-bottom:15px;"><label class="edit-label">Description</label><input id="edit-description" class="edit-input" value="' + description + '"/></div>' +
+        '<div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;">' +
+        '<div><label class="edit-label">Price ($)</label><input id="edit-price" type="number" class="edit-input" value="' + price + '"/></div>' +
+        '<div><label class="edit-label">Stock</label><input id="edit-stock" type="number" class="edit-input" value="' + stock + '"/></div>' +
+        '</div>' +
+        '<div class="modal-buttons" style="margin-top:25px;">' +
+        '<button class="modal-btn-cancel" onclick="this.closest(\'.modal-overlay\').remove()">Cancel</button>' +
+        '<button class="modal-btn-confirm" style="background:var(--gradient);" onclick="saveEdit(\'' + id + '\')">Save Changes</button>' +
+        '</div></div>';
+      document.body.appendChild(overlay);
+      overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+    }
+
+    async function saveEdit(id) {
+      const name = document.getElementById('edit-name').value;
+      const description = document.getElementById('edit-description').value;
+      const price = document.getElementById('edit-price').value;
+      const stock = document.getElementById('edit-stock').value;
+      const res = await apiCall('/api/products/' + id, 'PUT', {
+        name, description, price: parseFloat(price), stock: parseInt(stock)
+      });
+      if (res._id) {
+        document.querySelector('.modal-overlay').remove();
+        showAlert('Product updated ✅', 'success');
+        loadAdminProducts();
+        loadStats();
+      } else {
+        showAlert('Error updating product', 'error');
       }
     }
 
@@ -285,14 +303,8 @@
       const icon = document.getElementById('cat-icon').value || '🛍️';
       const image = document.getElementById('cat-image').value || '';
       const alertBox = document.getElementById('cat-alert');
-
-      if (!name) {
-        alertBox.innerHTML = '<div class="alert alert-error">Please enter category name</div>';
-        return;
-      }
-
+      if (!name) { alertBox.innerHTML = '<div class="alert alert-error">Please enter category name</div>'; return; }
       const res = await apiCall('/api/categories', 'POST', { name, icon, image });
-
       if (res._id) {
         alertBox.innerHTML = '<div class="alert alert-success">Category added! ✅</div>';
         document.getElementById('cat-name').value = '';
@@ -301,27 +313,27 @@
         loadAdminCategories();
         loadAdminProducts();
       } else {
-        alertBox.innerHTML = `<div class="alert alert-error">${res.message}</div>`;
+        alertBox.innerHTML = '<div class="alert alert-error">' + res.message + '</div>';
       }
     }
 
     async function deleteCategory(id) {
       if (!confirm('Delete this category?')) return;
-      await apiCall(`/api/categories/${id}`, 'DELETE');
+      await apiCall('/api/categories/' + id, 'DELETE');
       showAlert('Category deleted ✅', 'success');
       loadAdminCategories();
       loadAdminProducts();
     }
 
     async function toggleBestSeller(id) {
-      const res = await apiCall(`/api/products/${id}/bestseller`, 'PUT');
-      showAlert(`${res.isBestSeller ? '⭐ Added to' : '❌ Removed from'} Best Sellers`, 'success');
+      const res = await apiCall('/api/products/' + id + '/bestseller', 'PUT');
+      showAlert((res.isBestSeller ? '⭐ Added to' : '❌ Removed from') + ' Best Sellers', 'success');
       loadAdminProducts();
     }
 
     async function deleteProduct(id) {
       if (!confirm('Delete this product?')) return;
-      const res = await apiCall(`/api/products/${id}`, 'DELETE');
+      const res = await apiCall('/api/products/' + id, 'DELETE');
       if (res.message === 'Product deleted') {
         showAlert('Product deleted ✅', 'success');
         loadAdminProducts();
@@ -329,8 +341,18 @@
       }
     }
 
+    async function deleteOrder(id) {
+      if (!confirm('Delete this order?')) return;
+      const res = await apiCall('/api/orders/' + id, 'DELETE');
+      if (res.message === 'Order deleted') {
+        showAlert('Order deleted ✅', 'success');
+        loadAdminOrders();
+        loadStats();
+      }
+    }
+
     async function updateOrderStatus(id, status) {
-      await apiCall(`/api/orders/${id}`, 'PUT', { status });
+      await apiCall('/api/orders/' + id, 'PUT', { status });
       showAlert('Status updated ✅', 'success');
     }
 
@@ -340,206 +362,118 @@
       const revenue = orders.reduce ? orders.reduce((sum, o) => sum + o.totalPrice, 0) : 0;
       document.getElementById('stat-products').textContent = products.length || 0;
       document.getElementById('stat-orders').textContent = orders.length || 0;
-      document.getElementById('stat-revenue').textContent = `$${revenue.toFixed ? revenue.toFixed(0) : 0}`;
+      document.getElementById('stat-revenue').textContent = '$' + (revenue.toFixed ? revenue.toFixed(0) : 0);
     }
-async function deleteOrder(id) {
-  if (!confirm('Delete this order?')) return;
-  const res = await apiCall(`/api/orders/${id}`, 'DELETE');
-  if (res.message === 'Order deleted') {
-    showAlert('Order deleted ✅', 'success');
-    loadAdminOrders();
-    loadStats();
-  }
-}
-async function addCoupon() {
-  const code = document.getElementById('coupon-code').value.trim().toUpperCase();
-  const discountType = document.getElementById('coupon-type').value;
-  const discountValue = document.getElementById('coupon-value').value;
-  const minOrder = document.getElementById('coupon-min').value || 0;
-  const maxUses = document.getElementById('coupon-maxuses').value || 100;
-  const expiryDate = document.getElementById('coupon-expiry').value;
-  const alertBox = document.getElementById('coupon-alert');
 
-  if (!code || !discountValue || !expiryDate) {
-    alertBox.innerHTML = '<div class="alert alert-error">Please fill all required fields</div>';
-    return;
-  }
+    async function addCoupon() {
+      const code = document.getElementById('coupon-code').value.trim().toUpperCase();
+      const discountType = document.getElementById('coupon-type').value;
+      const discountValue = document.getElementById('coupon-value').value;
+      const minOrder = document.getElementById('coupon-min').value || 0;
+      const maxUses = document.getElementById('coupon-maxuses').value || 100;
+      const expiryDate = document.getElementById('coupon-expiry').value;
+      const alertBox = document.getElementById('coupon-alert');
+      if (!code || !discountValue || !expiryDate) { alertBox.innerHTML = '<div class="alert alert-error">Please fill all required fields</div>'; return; }
+      const res = await apiCall('/api/coupons', 'POST', { code, discountType, discountValue: parseFloat(discountValue), minOrder: parseFloat(minOrder), maxUses: parseInt(maxUses), expiryDate });
+      if (res._id) {
+        alertBox.innerHTML = '<div class="alert alert-success">Coupon added! ✅</div>';
+        document.getElementById('coupon-code').value = '';
+        document.getElementById('coupon-value').value = '';
+        document.getElementById('coupon-min').value = '';
+        document.getElementById('coupon-maxuses').value = '';
+        document.getElementById('coupon-expiry').value = '';
+        loadAdminCoupons();
+      } else { alertBox.innerHTML = '<div class="alert alert-error">' + res.message + '</div>'; }
+    }
 
-  const res = await apiCall('/api/coupons', 'POST', {
-    code, discountType,
-    discountValue: parseFloat(discountValue),
-    minOrder: parseFloat(minOrder),
-    maxUses: parseInt(maxUses),
-    expiryDate
-  });
+    async function toggleCoupon(id) {
+      const res = await apiCall('/api/coupons/' + id + '/toggle', 'PUT');
+      showAlert('Coupon ' + (res.isActive ? 'activated' : 'deactivated') + ' ✅', 'success');
+      loadAdminCoupons();
+    }
 
-  if (res._id) {
-    alertBox.innerHTML = '<div class="alert alert-success">Coupon added! ✅</div>';
-    document.getElementById('coupon-code').value = '';
-    document.getElementById('coupon-value').value = '';
-    document.getElementById('coupon-min').value = '';
-    document.getElementById('coupon-maxuses').value = '';
-    document.getElementById('coupon-expiry').value = '';
-    loadAdminCoupons();
-  } else {
-    alertBox.innerHTML = `<div class="alert alert-error">${res.message}</div>`;
-  }
-}
+    async function deleteCoupon(id) {
+      if (!confirm('Delete this coupon?')) return;
+      await apiCall('/api/coupons/' + id, 'DELETE');
+      showAlert('Coupon deleted ✅', 'success');
+      loadAdminCoupons();
+    }
 
-async function toggleCoupon(id) {
-  const res = await apiCall(`/api/coupons/${id}/toggle`, 'PUT');
-  showAlert(`Coupon ${res.isActive ? 'activated' : 'deactivated'} ✅`, 'success');
-  loadAdminCoupons();
-}
+    async function loadAdminCoupons() {
+      const container = document.getElementById('admin-coupons');
+      container.innerHTML = '<div class="loading">Loading...</div>';
+      const coupons = await apiCall('/api/coupons');
+      if (!coupons.length) { container.innerHTML = '<div class="empty"><p>No coupons yet</p></div>'; return; }
+      container.innerHTML = coupons.map(c =>
+        '<div class="product-row">' +
+        '<div style="background:rgba(108,99,255,0.1); padding:10px 18px; border-radius:10px; font-weight:800; font-size:15px; color:var(--primary); letter-spacing:1px;">' + c.code + '</div>' +
+        '<div class="product-row-info"><h4>' + (c.discountType === 'percentage' ? c.discountValue + '% off' : '$' + c.discountValue + ' off') + (c.minOrder > 0 ? ' · Min $' + c.minOrder : '') + '</h4><p>Used: ' + c.usedCount + '/' + c.maxUses + ' · Expires: ' + new Date(c.expiryDate).toLocaleDateString() + '</p></div>' +
+        '<span style="padding:5px 12px; border-radius:20px; font-size:11px; font-weight:700; background:' + (c.isActive ? 'rgba(67,233,123,0.12)' : 'rgba(255,101,132,0.1)') + '; color:' + (c.isActive ? '#1a7a3e' : 'var(--secondary)') + '; border:1px solid ' + (c.isActive ? 'rgba(67,233,123,0.3)' : 'rgba(255,101,132,0.3)') + ';">' + (c.isActive ? 'Active' : 'Inactive') + '</span>' +
+        '<button onclick="toggleCoupon(\'' + c._id + '\')" style="background:rgba(108,99,255,0.1); color:var(--primary); border:1px solid rgba(108,99,255,0.2); padding:8px 14px; border-radius:10px; cursor:pointer; font-size:13px; font-weight:600; font-family:\'Poppins\',sans-serif;">' + (c.isActive ? 'Deactivate' : 'Activate') + '</button>' +
+        '<button class="delete-btn" onclick="deleteCoupon(\'' + c._id + '\')"><i class="fas fa-trash"></i></button>' +
+        '</div>'
+      ).join('');
+    }
 
-async function deleteCoupon(id) {
-  if (!confirm('Delete this coupon?')) return;
-  await apiCall(`/api/coupons/${id}`, 'DELETE');
-  showAlert('Coupon deleted ✅', 'success');
-  loadAdminCoupons();
-}
-
-async function loadAdminCoupons() {
-  const container = document.getElementById('admin-coupons');
-  container.innerHTML = '<div class="loading">Loading...</div>';
-  const coupons = await apiCall('/api/coupons');
-
-  if (!coupons.length) {
-    container.innerHTML = '<div class="empty"><p>No coupons yet</p></div>';
-    return;
-  }
-
-  container.innerHTML = coupons.map(c => `
-    <div class="product-row">
-      <div style="background:rgba(108,99,255,0.1); padding:10px 18px; border-radius:10px; font-weight:800; font-size:15px; color:var(--primary); letter-spacing:1px;">
-        ${c.code}
-      </div>
-      <div class="product-row-info">
-        <h4>${c.discountType === 'percentage' ? `${c.discountValue}% off` : `$${c.discountValue} off`}
-          ${c.minOrder > 0 ? `· Min $${c.minOrder}` : ''}
-        </h4>
-        <p>Used: ${c.usedCount}/${c.maxUses} · Expires: ${new Date(c.expiryDate).toLocaleDateString()}</p>
-      </div>
-      <span style="padding:5px 12px; border-radius:20px; font-size:11px; font-weight:700;
-        background:${c.isActive ? 'rgba(67,233,123,0.12)' : 'rgba(255,101,132,0.1)'};
-        color:${c.isActive ? '#1a7a3e' : 'var(--secondary)'};
-        border:1px solid ${c.isActive ? 'rgba(67,233,123,0.3)' : 'rgba(255,101,132,0.3)'};">
-        ${c.isActive ? 'Active' : 'Inactive'}
-      </span>
-      <button onclick="toggleCoupon('${c._id}')"
-        style="background:rgba(108,99,255,0.1); color:var(--primary); border:1px solid rgba(108,99,255,0.2);
-        padding:8px 14px; border-radius:10px; cursor:pointer; font-size:13px; font-weight:600; font-family:'Poppins',sans-serif;">
-        ${c.isActive ? 'Deactivate' : 'Activate'}
-      </button>
-      <button class="delete-btn" onclick="deleteCoupon('${c._id}')">
-        <i class="fas fa-trash"></i>
-      </button>
-    </div>
-  `).join('');
-}
     async function loadAdminProducts() {
       const categories = await apiCall('/api/categories');
       const catSelect = document.getElementById('category');
       if (catSelect) {
         catSelect.innerHTML = '<option value="">Select Category</option>';
-        categories.forEach(c => {
-          catSelect.innerHTML += `<option value="${c.name}">${c.icon} ${c.name}</option>`;
-        });
+        categories.forEach(c => { catSelect.innerHTML += '<option value="' + c.name + '">' + c.icon + ' ' + c.name + '</option>'; });
       }
-
       const container = document.getElementById('admin-products');
       container.innerHTML = '<div class="loading">Loading...</div>';
       const products = await apiCall('/api/products');
-
-      if (!products.length) {
-        container.innerHTML = '<div class="empty"><p>No products yet</p></div>';
-        return;
-      }
-
-      container.innerHTML = products.map(p => `
-        <div class="product-row">
-          <img src="${p.image}" onerror="this.src='https://via.placeholder.com/65?text=No+Image'"/>
-          <div class="product-row-info">
-            <h4>${p.name}</h4>
-            <p>$${p.price.toFixed(2)} · ${p.category} · Stock: ${p.stock}</p>
-          </div>
-          <button onclick="toggleBestSeller('${p._id}')"
-            style="background:${p.isBestSeller ? 'rgba(255,193,7,0.15)' : 'rgba(108,99,255,0.1)'};
-            color:${p.isBestSeller ? '#b7791f' : 'var(--primary)'};
-            border:1px solid ${p.isBestSeller ? 'rgba(255,193,7,0.3)' : 'rgba(108,99,255,0.2)'};
-            padding:8px 14px; border-radius:10px; cursor:pointer;
-            font-size:13px; font-weight:600; font-family:'Poppins',sans-serif; margin-right:8px">
-            ${p.isBestSeller ? '⭐ Best Seller' : '☆ Set Best Seller'}
-          </button>
-          <button class="delete-btn" onclick="deleteProduct('${p._id}')">
-            <i class="fas fa-trash"></i> Delete
-          </button>
-        </div>
-      `).join('');
+      if (!products.length) { container.innerHTML = '<div class="empty"><p>No products yet</p></div>'; return; }
+      container.innerHTML = products.map(p =>
+        '<div class="product-row">' +
+        '<img src="' + p.image + '" onerror="this.src=\'https://via.placeholder.com/65?text=No+Image\'"/>' +
+        '<div class="product-row-info"><h4>' + p.name + '</h4><p>$' + p.price.toFixed(2) + ' · ' + p.category + ' · Stock: ' + p.stock + '</p></div>' +
+        '<button onclick="toggleBestSeller(\'' + p._id + '\')" style="background:' + (p.isBestSeller ? 'rgba(255,193,7,0.15)' : 'rgba(108,99,255,0.1)') + '; color:' + (p.isBestSeller ? '#b7791f' : 'var(--primary)') + '; border:1px solid ' + (p.isBestSeller ? 'rgba(255,193,7,0.3)' : 'rgba(108,99,255,0.2)') + '; padding:8px 14px; border-radius:10px; cursor:pointer; font-size:13px; font-weight:600; font-family:\'Poppins\',sans-serif; margin-right:8px">' + (p.isBestSeller ? '⭐ Best Seller' : '☆ Set Best Seller') + '</button>' +
+        '<button class="edit-btn" onclick="editProduct(\'' + p._id + '\', \'' + p.name.replace(/'/g, "\\'") + '\', \'' + p.description.replace(/'/g, "\\'") + '\', ' + p.price + ', ' + p.stock + ')"><i class="fas fa-edit"></i> Edit</button>' +
+        '<button class="delete-btn" onclick="deleteProduct(\'' + p._id + '\')"><i class="fas fa-trash"></i> Delete</button>' +
+        '</div>'
+      ).join('');
     }
 
     async function loadAdminOrders() {
       const container = document.getElementById('admin-orders');
       container.innerHTML = '<div class="loading">Loading...</div>';
       const orders = await apiCall('/api/orders');
-      if (!orders.length) {
-        container.innerHTML = '<div class="empty"><i class="fas fa-shopping-bag"></i><p>No orders yet</p></div>';
-        return;
-      }
-      container.innerHTML = orders.map(order => `
-        <div class="order-row">
-          <div class="order-row-header">
-            <strong>Order #${order._id.slice(-6).toUpperCase()}</strong>
-            <span class="status-badge status-${order.status}">${order.status}</span>
-          </div>
-          <div class="order-meta">
-            👤 ${order.user?.name || 'User'} (${order.user?.email || ''}) ·
-            📅 ${new Date(order.createdAt).toLocaleDateString()}
-          </div>
-          <div class="order-items-list">
-            ${order.items.map(i => `${i.name} x${i.quantity}`).join(', ')}
-          </div>
-         <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
-  <strong style="color:var(--primary)">$${order.totalPrice.toFixed(2)}</strong>
-  <div style="display:flex; gap:8px; align-items:center;">
-    <select class="status-select" onchange="updateOrderStatus('${order._id}', this.value)">
-      <option value="pending" ${order.status==='pending'?'selected':''}>Pending</option>
-      <option value="processing" ${order.status==='processing'?'selected':''}>Processing</option>
-      <option value="delivered" ${order.status==='delivered'?'selected':''}>Delivered</option>
-    </select>
-    <button onclick="deleteOrder('${order._id}')" 
-      style="background:rgba(255,101,132,0.1); color:var(--secondary); border:1px solid rgba(255,101,132,0.3);
-      padding:6px 14px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; font-family:'Poppins',sans-serif;">
-      <i class="fas fa-trash"></i>
-    </button>
-  </div>
-</div>
-        </div>
-      `).join('');
+      if (!orders.length) { container.innerHTML = '<div class="empty"><i class="fas fa-shopping-bag"></i><p>No orders yet</p></div>'; return; }
+      container.innerHTML = orders.map(order =>
+        '<div class="order-row">' +
+        '<div class="order-row-header"><strong>Order #' + order._id.slice(-6).toUpperCase() + '</strong><span class="status-badge status-' + order.status + '">' + order.status + '</span></div>' +
+        '<div class="order-meta">👤 ' + (order.user?.name || 'User') + ' (' + (order.user?.email || '') + ') · 📅 ' + new Date(order.createdAt).toLocaleDateString() + '</div>' +
+        '<div class="order-items-list">' + order.items.map(i => i.name + ' x' + i.quantity).join(', ') + '</div>' +
+        '<div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">' +
+        '<strong style="color:var(--primary)">$' + order.totalPrice.toFixed(2) + '</strong>' +
+        '<div style="display:flex; gap:8px; align-items:center;">' +
+        '<select class="status-select" onchange="updateOrderStatus(\'' + order._id + '\', this.value)">' +
+        '<option value="pending"' + (order.status==='pending'?' selected':'') + '>Pending</option>' +
+        '<option value="processing"' + (order.status==='processing'?' selected':'') + '>Processing</option>' +
+        '<option value="shipped"' + (order.status==='shipped'?' selected':'') + '>Shipped</option>' +
+        '<option value="delivered"' + (order.status==='delivered'?' selected':'') + '>Delivered</option>' +
+        '<option value="cancelled"' + (order.status==='cancelled'?' selected':'') + '>Cancelled</option>' +
+        '</select>' +
+        '<button onclick="deleteOrder(\'' + order._id + '\')" style="background:rgba(255,101,132,0.1); color:var(--secondary); border:1px solid rgba(255,101,132,0.3); padding:6px 14px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; font-family:\'Poppins\',sans-serif;"><i class="fas fa-trash"></i></button>' +
+        '</div></div></div>'
+      ).join('');
     }
 
     async function loadAdminCategories() {
       const container = document.getElementById('admin-categories');
       container.innerHTML = '<div class="loading">Loading...</div>';
       const categories = await apiCall('/api/categories');
-
-      if (!categories.length) {
-        container.innerHTML = '<div class="empty"><p>No categories yet</p></div>';
-        return;
-      }
-
-      container.innerHTML = categories.map(c => `
-        <div class="product-row">
-          <div style="font-size:36px">${c.icon}</div>
-          <div class="product-row-info">
-            <h4>${c.name}</h4>
-            ${c.image ? `<img src="${c.image}" style="width:50px;height:50px;object-fit:cover;border-radius:8px;margin-top:5px"/>` : ''}
-          </div>
-          <button class="delete-btn" onclick="deleteCategory('${c._id}')">
-            <i class="fas fa-trash"></i> Delete
-          </button>
-        </div>
-      `).join('');
+      if (!categories.length) { container.innerHTML = '<div class="empty"><p>No categories yet</p></div>'; return; }
+      container.innerHTML = categories.map(c =>
+        '<div class="product-row">' +
+        '<div style="font-size:36px">' + c.icon + '</div>' +
+        '<div class="product-row-info"><h4>' + c.name + '</h4>' + (c.image ? '<img src="' + c.image + '" style="width:50px;height:50px;object-fit:cover;border-radius:8px;margin-top:5px"/>' : '') + '</div>' +
+        '<button class="delete-btn" onclick="deleteCategory(\'' + c._id + '\')"><i class="fas fa-trash"></i> Delete</button>' +
+        '</div>'
+      ).join('');
     }
 
     loadAdminProducts();

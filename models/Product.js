@@ -16,6 +16,8 @@ const productSchema = new mongoose.Schema({
   category: { type: String, required: true },
   stock: { type: Number, default: 0 },
   isBestSeller: { type: Boolean, default: false },
+  sizes: [{ type: String }],
+  colors: [{ type: String }],
   reviews: [reviewSchema]
 }, { timestamps: true });
 

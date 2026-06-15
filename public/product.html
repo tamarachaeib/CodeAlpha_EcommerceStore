@@ -2,15 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-   <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
-
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Cinzel+Decorative:wght@700;900&display=swap" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Product - ShopZone</title>
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
-    /* Image Slideshow */
     .slideshow {
       position: relative;
       border-radius: 24px;
@@ -63,70 +61,6 @@
       width: 24px;
       border-radius: 4px;
     }
-
-    /* Tracking */
-    .tracking-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: relative;
-      margin: 20px 0;
-    }
-    .tracking-bar::before {
-      content: '';
-      position: absolute;
-      top: 20px;
-      left: 0; right: 0;
-      height: 3px;
-      background: var(--border);
-      z-index: 0;
-    }
-    .tracking-progress {
-      position: absolute;
-      top: 20px;
-      left: 0;
-      height: 3px;
-      background: var(--gradient);
-      z-index: 1;
-      transition: width 0.5s ease;
-    }
-    .tracking-step {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      z-index: 2;
-    }
-    .step-circle {
-      width: 40px; height: 40px;
-      border-radius: 50%;
-      background: #fff;
-      border: 3px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      transition: all 0.3s;
-    }
-    .step-circle.active {
-      border-color: var(--primary);
-      background: var(--primary);
-      color: #fff;
-    }
-    .step-circle.done {
-      border-color: var(--accent);
-      background: var(--accent);
-      color: #fff;
-    }
-    .step-label {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-light);
-      text-align: center;
-    }
-    .step-label.active { color: var(--primary); }
-
-    /* Related products */
     .related-section {
       max-width: 1000px;
       margin: 0 auto 80px;
@@ -139,8 +73,6 @@
       margin-bottom: 25px;
       letter-spacing: -0.5px;
     }
-
-    /* Sold out badge */
     .sold-out-badge {
       display: inline-block;
       background: rgba(255,101,132,0.1);
@@ -154,7 +86,6 @@
       letter-spacing: 1px;
       margin-bottom: 15px;
     }
-
     .in-stock-badge {
       display: inline-block;
       background: rgba(67,233,123,0.1);
@@ -192,7 +123,6 @@
 
   <div id="product-detail"></div>
 
-  <!-- Related Products -->
   <div class="related-section">
     <div id="related-products"></div>
   </div>
@@ -206,6 +136,55 @@
   <script>
     let currentSlide = 0;
     let productImages = [];
+    let selectedSize = null;
+    let selectedColor = null;
+
+    function selectSize(btn) {
+      document.querySelectorAll('[data-size]').forEach(b => {
+        b.style.borderColor = 'var(--border)';
+        b.style.background = '#fff';
+        b.style.color = 'var(--text)';
+      });
+      btn.style.borderColor = 'var(--primary)';
+      btn.style.background = 'var(--primary)';
+      btn.style.color = '#fff';
+      selectedSize = btn.dataset.size;
+    }
+
+    function selectColor(btn) {
+      document.querySelectorAll('[data-color]').forEach(b => {
+        b.style.borderColor = 'var(--border)';
+        b.style.background = '#fff';
+        b.style.color = 'var(--text)';
+      });
+      btn.style.borderColor = 'var(--primary)';
+      btn.style.background = 'var(--primary)';
+      btn.style.color = '#fff';
+      selectedColor = btn.dataset.color;
+    }
+
+    function addToCartWithOptions(product) {
+      const hasSizes = product.sizes && product.sizes.length > 0;
+      const hasColors = product.colors && product.colors.length > 0;
+
+      if (hasSizes && !selectedSize) {
+        showAlert('Please select a size', 'error');
+        return;
+      }
+      if (hasColors && !selectedColor) {
+        showAlert('Please select a color', 'error');
+        return;
+      }
+
+      const cartProduct = {
+        ...product,
+        selectedSize: selectedSize || null,
+        selectedColor: selectedColor || null,
+        _id: product._id + (selectedSize || '') + (selectedColor || '')
+      };
+
+      addToCart(cartProduct);
+    }
 
     function initSlideshow(images) {
       productImages = images;
@@ -267,14 +246,15 @@
           : [product.image];
 
         const isSoldOut = product.stock === 0;
+        const productJson = JSON.stringify(product).replace(/"/g, '&quot;');
 
         container.innerHTML = `
           <div class="product-detail">
             <div>
               <div class="slideshow">
-                <button class="slide-btn slide-prev" onclick="prevSlide()">‹</button>
+                <button class="slide-btn slide-prev" onclick="prevSlide()">&#8249;</button>
                 <div class="slideshow-images" id="slideshow-images"></div>
-                <button class="slide-btn slide-next" onclick="nextSlide()">›</button>
+                <button class="slide-btn slide-next" onclick="nextSlide()">&#8250;</button>
               </div>
               <div class="slide-dots" id="slide-dots"></div>
             </div>
@@ -287,11 +267,44 @@
               <h1>${product.name}</h1>
               <div class="price">$${product.price.toFixed(2)}</div>
               <p>${product.description}</p>
+
+              ${product.sizes && product.sizes.length > 0 ? `
+                <div style="margin-bottom:20px;">
+                  <div style="font-size:13px; font-weight:700; color:var(--dark2); margin-bottom:10px;">SIZE</div>
+                  <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                    ${product.sizes.map(s => `
+                      <button onclick="selectSize(this)" data-size="${s}"
+                        style="padding:8px 16px; border:2px solid var(--border); background:#fff;
+                        border-radius:8px; cursor:pointer; font-size:13px; font-weight:600;
+                        font-family:'Poppins',sans-serif; transition:all 0.2s;">
+                        ${s}
+                      </button>
+                    `).join('')}
+                  </div>
+                </div>
+              ` : ''}
+
+              ${product.colors && product.colors.length > 0 ? `
+                <div style="margin-bottom:20px;">
+                  <div style="font-size:13px; font-weight:700; color:var(--dark2); margin-bottom:10px;">COLOR</div>
+                  <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                    ${product.colors.map(c => `
+                      <button onclick="selectColor(this)" data-color="${c}"
+                        style="padding:8px 16px; border:2px solid var(--border); background:#fff;
+                        border-radius:8px; cursor:pointer; font-size:13px; font-weight:600;
+                        font-family:'Poppins',sans-serif; transition:all 0.2s;">
+                        ${c}
+                      </button>
+                    `).join('')}
+                  </div>
+                </div>
+              ` : ''}
+
               ${isSoldOut
                 ? `<button class="btn-primary" disabled style="opacity:0.5; cursor:not-allowed; width:100%">
                     🚫 Out of Stock
                    </button>`
-                : `<button class="btn-primary" style="width:100%" onclick='addToCart(${JSON.stringify(product).replace(/"/g, "&quot;")})'>
+                : `<button class="btn-primary" style="width:100%" onclick="addToCartWithOptions(${productJson})">
                     <i class="fas fa-shopping-cart"></i> Add to Cart
                    </button>`
               }
@@ -314,9 +327,7 @@
       try {
         const products = await apiCall(`/api/products?category=${encodeURIComponent(category)}`);
         const related = products.filter(p => p._id !== currentId).slice(0, 4);
-
         if (!related.length) return;
-
         container.innerHTML = `
           <h2>Related Products</h2>
           <div class="products-grid">
