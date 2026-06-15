@@ -11,8 +11,9 @@ router.post('/', protect, async (req, res) => {
     const { items, totalPrice, shippingAddress, discountCode, discountAmount } = req.body;
 
     // Reduce stock for each item
-    for (const item of items) {
-      const product = await Product.findById(item.product);
+   for (const item of items) {
+      const cleanId = item.product.toString().slice(0, 24);
+      const product = await Product.findById(cleanId);
       if (product) {
         product.stock = Math.max(0, product.stock - item.quantity);
         await product.save();
@@ -28,9 +29,14 @@ router.post('/', protect, async (req, res) => {
       }
     }
 
+    const cleanItems = items.map(item => ({
+      ...item,
+      product: item.product.toString().slice(0, 24)
+    }));
+
     const order = await Order.create({
       user: req.user.id,
-      items,
+      items: cleanItems,
       totalPrice,
       discountCode: discountCode || '',
       discountAmount: discountAmount || 0,
