@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cart - SHOPTOP</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-brand">🛍️ SHOPTOP</div>
+    <div class="nav-links">
+     <a href="/index.html">Home</a>
+<a href="/products.html">Products</a>
+<a href="/cart.html"><i class="fas fa-shopping-cart"></i> Cart <span id="cart-count">0</span></a>
+<a href="/orders.html" id="nav-orders" style="display:none">My Orders</a>
+<a href="/admin.html" id="nav-admin" style="display:none">⚙️ Admin</a>
+<a href="/login.html" id="nav-login">Login</a>
+<a href="#" id="nav-logout" style="display:none">Logout</a>
+<span id="nav-username" style="color:#fff;margin-left:10px"></span>
+    </div>
+  </nav>
+
+  <div class="cart-container">
+    <h2>Shopping Cart</h2>
+    <div id="cart-items"></div>
+    <div id="cart-summary"></div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2025 SHOPTOP. All rights reserved.</p>
+  </footer>
+
+  <script src="/js/main.js"></script>
+  <script>
+    function renderCart() {
+      const cart = getCart();
+      const itemsDiv = document.getElementById('cart-items');
+      const summaryDiv = document.getElementById('cart-summary');
+
+      if (cart.length === 0) {
+        itemsDiv.innerHTML = `
+          <div class="empty">
+            <i class="fas fa-shopping-cart"></i>
+            <p>Your cart is empty</p>
+            <a href="/products.html" class="btn-primary" style="margin-top:20px">Shop Now</a>
+          </div>`;
+        summaryDiv.innerHTML = '';
+        return;
+      }
+
+      itemsDiv.innerHTML = cart.map(item => `
+        <div class="cart-item">
+          <img src="${item.image}" alt="${item.name}" 
+            onerror="this.src='https://via.placeholder.com/80x80?text=No+Image'"/>
+          <div class="cart-item-info">
+            <h3>${item.name}</h3>
+            <p>$${item.price.toFixed(2)}</p>
+          </div>
+          <div class="cart-item-actions">
+            <button onclick="changeQty('${item._id}', -1)">-</button>
+            <span>${item.quantity}</span>
+            <button onclick="changeQty('${item._id}', 1)">+</button>
+            <button class="remove-btn" onclick="removeItem('${item._id}')">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+      summaryDiv.innerHTML = `
+        <div class="cart-summary">
+          <h3>Total: $${total.toFixed(2)}</h3>
+          <button class="btn-primary" onclick="checkout()">
+            Proceed to Checkout
+          </button>
+        </div>
+      `;
+    }
+
+    function changeQty(id, delta) {
+      const cart = getCart();
+      const item = cart.find(i => i._id === id);
+      if (item) {
+        item.quantity += delta;
+        if (item.quantity <= 0) {
+          const index = cart.indexOf(item);
+          cart.splice(index, 1);
+        }
+      }
+      saveCart(cart);
+      renderCart();
+    }
+
+    function removeItem(id) {
+      const cart = getCart();
+      const newCart = cart.filter(i => i._id !== id);
+      saveCart(newCart);
+      renderCart();
+    }
+
+    function checkout() {
+      const user = getUser();
+      if (!user) {
+        window.location.href = '/login.html';
+        return;
+      }
+      window.location.href = '/checkout.html';
+    }
+
+    renderCart();
+  </script>
+</body>
+</html>

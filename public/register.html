@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register - SHOPTOP</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-brand">🛍️ SHOPTOPSHOPTOP</div>
+    <div class="nav-links">
+      <a href="/index.html">Home</a>
+<a href="/products.html">Products</a>
+<a href="/cart.html"><i class="fas fa-shopping-cart"></i> Cart <span id="cart-count">0</span></a>
+<a href="/orders.html" id="nav-orders" style="display:none">My Orders</a>
+<a href="/admin.html" id="nav-admin" style="display:none">⚙️ Admin</a>
+<a href="/login.html" id="nav-login">Login</a>
+<a href="#" id="nav-logout" style="display:none">Logout</a>
+<span id="nav-username" style="color:#fff;margin-left:10px"></span>
+      <span id="nav-username" style="color:#fff;margin-left:10px"></span>
+    </div>
+  </nav>
+
+  <div class="form-container">
+    <h2>Create Account</h2>
+    <div id="alert-box"></div>
+    <div class="form-group">
+      <label>Name</label>
+      <input type="text" id="name" placeholder="Enter your name" />
+    </div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="email" placeholder="Enter your email" />
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="password" placeholder="Enter your password" />
+    </div>
+    <button onclick="handleRegister()">Register</button>
+    <p>Already have an account? <a href="/login.html">Login</a></p>
+  </div>
+
+  <script src="/js/main.js"></script>
+  <script>
+    async function handleRegister() {
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const alertBox = document.getElementById('alert-box');
+
+      if (!name || !email || !password) {
+        alertBox.innerHTML = '<div class="alert alert-error">Please fill all fields</div>';
+        return;
+      }
+
+      const res = await apiCall('/api/auth/register', 'POST', { name, email, password });
+
+      if (res.token) {
+        localStorage.setItem('token', res.token);
+        localStorage.setItem('user', JSON.stringify(res));
+        window.location.href = '/index.html';
+      } else {
+        alertBox.innerHTML = `<div class="alert alert-error">${res.message}</div>`;
+      }
+    }
+  </script>
+</body>
+</html>

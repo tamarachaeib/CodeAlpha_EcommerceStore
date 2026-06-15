@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Products - ShopZone</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-brand">🛍️ ShopZone</div>
+    <div class="nav-links">
+      <a href="/index.html">Home</a>
+      <a href="/products.html">Products</a>
+      <div class="nav-dropdown">
+        <a href="#" class="dropdown-toggle">Categories <i class="fas fa-chevron-down"></i></a>
+        <div class="dropdown-menu" id="nav-categories"></div>
+      </div>
+      <a href="/cart.html"><i class="fas fa-shopping-cart"></i> Cart <span id="cart-count">0</span></a>
+      <a href="/orders.html" id="nav-orders" style="display:none">My Orders</a>
+      <a href="/admin.html" id="nav-admin" style="display:none">⚙️ Admin</a>
+      <a href="/login.html" id="nav-login">Login</a>
+      <a href="#" id="nav-logout" style="display:none">Logout</a>
+      <span id="nav-username" style="color:#fff;margin-left:10px"></span>
+    </div>
+  </nav>
+
+  <div class="page-header">
+    <h1>All Products</h1>
+  </div>
+
+  <!-- Filters Bar -->
+  <div class="filters-bar">
+    <!-- Search -->
+    <div class="filter-search">
+      <i class="fas fa-search"></i>
+      <input type="text" id="search-input" placeholder="Search products..." oninput="applyFilters()" />
+    </div>
+
+    <!-- Category Filter -->
+    <div class="filter-group">
+      <select id="category-select" onchange="applyFilters()">
+        <option value="">All Categories</option>
+      </select>
+    </div>
+
+    <!-- Price Filter -->
+    <div class="filter-group">
+      <select id="price-select" onchange="applyFilters()">
+        <option value="">All Prices</option>
+        <option value="0-25">Under $25</option>
+        <option value="25-50">$25 - $50</option>
+        <option value="50-100">$50 - $100</option>
+        <option value="100-200">$100 - $200</option>
+        <option value="200-99999">Above $200</option>
+      </select>
+    </div>
+
+    <!-- Sort -->
+    <div class="filter-group">
+      <select id="sort-select" onchange="applyFilters()">
+        <option value="">Sort By</option>
+        <option value="price-low">Price: Low to High</option>
+        <option value="price-high">Price: High to Low</option>
+        <option value="name">Name A-Z</option>
+      </select>
+    </div>
+
+    <!-- Best Sellers Toggle -->
+    <button class="filter-toggle-btn" id="bestseller-btn" onclick="toggleBestSeller()">
+      ☆ Best Sellers
+    </button>
+
+    <!-- Clear Filters -->
+    <button class="clear-filter-btn" onclick="clearFilters()">
+      <i class="fas fa-times"></i> Clear
+    </button>
+  </div>
+
+  <!-- Active Filters -->
+  <div class="active-filters" id="active-filters"></div>
+
+  <!-- Products -->
+  <div class="products-section">
+    <div id="results-count" style="margin-bottom:20px; color:var(--text-light); font-size:14px; font-weight:500;"></div>
+    <div class="products-grid" id="products-grid"></div>
+  </div>
+
+  <footer>
+    <p>© 2025 ShopZone. All rights reserved.</p>
+  </footer>
+
+  <script src="/js/main.js"></script>
+  <script src="/js/index.js"></script>
+  <script>
+    let allProducts = [];
+    let showBestSellers = false;
+
+    async function loadProducts() {
+      const grid = document.getElementById('products-grid');
+      grid.innerHTML = '<div class="loading">Loading products...</div>';
+
+      try {
+        allProducts = await apiCall('/api/products');
+
+        // Load categories into select
+        const categories = await apiCall('/api/categories');
+        const catSelect = document.getElementById('category-select');
+        categories.forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c.name;
+          opt.textContent = `${c.icon} ${c.name}`;
+          catSelect.appendChild(opt);
+        });
+
+        // Check URL params
+        const params = new URLSearchParams(window.location.search);
+        const urlCategory = params.get('category');
+        if (urlCategory) {
+          catSelect.value = urlCategory;
+        }
+
+        applyFilters();
+      } catch (error) {
+        grid.innerHTML = '<div class="empty"><p>Error loading products</p></div>';
+      }
+    }
+
+    function toggleBestSeller() {
+      showBestSellers = !showBestSellers;
+      const btn = document.getElementById('bestseller-btn');
+      btn.classList.toggle('active');
+      btn.textContent = showBestSellers ? '⭐ Best Sellers' : '☆ Best Sellers';
+      applyFilters();
+    }
+
+    function applyFilters() {
+      const search = document.getElementById('search-input').value.toLowerCase();
+      const category = document.getElementById('category-select').value;
+      const price = document.getElementById('price-select').value;
+      const sort = document.getElementById('sort-select').value;
+
+      let filtered = [...allProducts];
+
+      // Best sellers
+      if (showBestSellers) filtered = filtered.filter(p => p.isBestSeller);
+
+      // Search
+      if (search) filtered = filtered.filter(p =>
+        p.name.toLowerCase().includes(search) ||
+        p.description.toLowerCase().includes(search)
+      );
+
+      // Category
+      if (category) filtered = filtered.filter(p => p.category === category);
+
+      // Price
+      if (price) {
+        const [min, max] = price.split('-').map(Number);
+        filtered = filtered.filter(p => p.price >= min && p.price <= max);
+      }
+
+      // Sort
+      if (sort === 'price-low') filtered.sort((a, b) => a.price - b.price);
+      else if (sort === 'price-high') filtered.sort((a, b) => b.price - a.price);
+      else if (sort === 'name') filtered.sort((a, b) => a.name.localeCompare(b.name));
+
+      renderProducts(filtered);
+      updateActiveFilters(search, category, price, sort);
+    }
+
+    function updateActiveFilters(search, category, price, sort) {
+      const container = document.getElementById('active-filters');
+      const count = document.getElementById('results-count');
+      const grid = document.getElementById('products-grid');
+      const total = grid.querySelectorAll('.product-card').length;
+
+      count.textContent = `Showing ${total} products`;
+
+      let tags = [];
+      if (search) tags.push(`Search: "${search}"`);
+      if (category) tags.push(`Category: ${category}`);
+      if (price) tags.push(`Price: $${price.replace('-', ' - $')}`);
+      if (sort) tags.push(`Sort: ${sort}`);
+      if (showBestSellers) tags.push('⭐ Best Sellers');
+
+      container.innerHTML = tags.map(t => `
+        <span class="filter-tag">${t}</span>
+      `).join('');
+    }
+
+    function clearFilters() {
+      document.getElementById('search-input').value = '';
+      document.getElementById('category-select').value = '';
+      document.getElementById('price-select').value = '';
+      document.getElementById('sort-select').value = '';
+      showBestSellers = false;
+      document.getElementById('bestseller-btn').classList.remove('active');
+      document.getElementById('bestseller-btn').textContent = '☆ Best Sellers';
+      applyFilters();
+    }
+
+    function renderProducts(products) {
+      const grid = document.getElementById('products-grid');
+      const count = document.getElementById('results-count');
+
+      if (!products.length) {
+        grid.innerHTML = '<div class="empty"><i class="fas fa-search"></i><p>No products found</p></div>';
+        count.textContent = 'Showing 0 products';
+        return;
+      }
+
+      grid.innerHTML = products.map(p => renderProductCard(p)).join('');
+      count.textContent = `Showing ${products.length} products`;
+    }
+
+    loadProducts();
+  </script>
+</body>
+</html>

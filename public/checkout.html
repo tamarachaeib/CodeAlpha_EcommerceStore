@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Checkout - ShopZone</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-brand">🛍️ ShopZone</div>
+    <div class="nav-links">
+      <a href="/index.html">Home</a>
+      <a href="/products.html">Products</a>
+      <div class="nav-dropdown">
+        <a href="#" class="dropdown-toggle">Categories <i class="fas fa-chevron-down"></i></a>
+        <div class="dropdown-menu" id="nav-categories"></div>
+      </div>
+      <a href="/cart.html"><i class="fas fa-shopping-cart"></i> Cart <span id="cart-count">0</span></a>
+      <a href="/orders.html" id="nav-orders" style="display:none">My Orders</a>
+      <a href="/admin.html" id="nav-admin" style="display:none">⚙️ Admin</a>
+      <a href="/login.html" id="nav-login">Login</a>
+      <a href="#" id="nav-logout" style="display:none">Logout</a>
+      <span id="nav-username" style="color:#fff;margin-left:10px"></span>
+    </div>
+  </nav>
+
+  <div style="max-width:900px; margin:60px auto; padding:0 30px; display:grid; grid-template-columns:1fr 1fr; gap:40px;">
+
+    <!-- Left: Form -->
+    <div>
+      <h2 style="font-size:26px; font-weight:800; color:var(--dark2); margin-bottom:25px; letter-spacing:-0.5px;">
+        Shipping Details
+      </h2>
+      <div id="alert-box"></div>
+
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="fullName" placeholder="Enter your full name" />
+      </div>
+      <div class="form-group">
+        <label>Address</label>
+        <input type="text" id="address" placeholder="Enter your address" />
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px">
+        <div class="form-group">
+          <label>City</label>
+          <input type="text" id="city" placeholder="City" />
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="text" id="phone" placeholder="Phone number" />
+        </div>
+      </div>
+
+      <!-- Coupon -->
+      <div style="background:#f8f9ff; border-radius:16px; padding:20px; margin-bottom:20px; border:2px solid var(--border);">
+        <h3 style="font-size:15px; font-weight:700; color:var(--dark2); margin-bottom:12px;">
+          🎟️ Coupon Code
+        </h3>
+        <div style="display:flex; gap:10px;">
+          <input type="text" id="coupon-input" placeholder="Enter coupon code"
+            style="flex:1; padding:12px 16px; border:2px solid var(--border); border-radius:10px; font-size:14px; outline:none; font-family:'Poppins',sans-serif; text-transform:uppercase;"/>
+          <button onclick="applyCoupon()"
+            style="background:var(--gradient); color:#fff; border:none; padding:12px 20px; border-radius:10px; cursor:pointer; font-weight:700; font-family:'Poppins',sans-serif; white-space:nowrap;">
+            Apply
+          </button>
+        </div>
+        <div id="coupon-result" style="margin-top:10px; font-size:13px;"></div>
+      </div>
+
+      <button class="btn-primary" style="width:100%" onclick="placeOrder()">
+        <i class="fas fa-check-circle"></i> Place Order
+      </button>
+    </div>
+
+    <!-- Right: Order Summary -->
+    <div>
+      <h2 style="font-size:26px; font-weight:800; color:var(--dark2); margin-bottom:25px; letter-spacing:-0.5px;">
+        Order Summary
+      </h2>
+      <div id="order-summary"></div>
+    </div>
+  </div>
+
+  <footer><p>© 2025 ShopZone. All rights reserved.</p></footer>
+
+  <script src="/js/main.js"></script>
+  <script src="/js/index.js"></script>
+  <script>
+    const user = getUser();
+    if (!user) window.location.href = '/login.html';
+
+    let appliedCoupon = null;
+
+    function showSummary() {
+      const cart = getCart();
+      const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const discount = appliedCoupon ? appliedCoupon.discountAmount : 0;
+      const total = subtotal - discount;
+
+      document.getElementById('order-summary').innerHTML = `
+        <div style="background:#fff; border-radius:16px; padding:20px; box-shadow:0 2px 15px rgba(0,0,0,0.05); border:1px solid var(--border);">
+          ${cart.map(item => `
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:15px;">
+              <img src="${item.image}" style="width:55px;height:55px;object-fit:cover;border-radius:10px;"
+                onerror="this.src='https://via.placeholder.com/55?text=No'"/>
+              <div style="flex:1">
+                <div style="font-weight:700; font-size:14px; color:var(--dark2)">${item.name}</div>
+                <div style="font-size:12px; color:var(--text-light)">x${item.quantity}</div>
+              </div>
+              <div style="font-weight:700; color:var(--primary)">$${(item.price * item.quantity).toFixed(2)}</div>
+            </div>
+          `).join('')}
+          <hr style="margin:15px 0; border-color:var(--border)"/>
+          <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+            <span style="color:var(--text-light)">Subtotal</span>
+            <span style="font-weight:600">$${subtotal.toFixed(2)}</span>
+          </div>
+          ${discount > 0 ? `
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+              <span style="color:#1a7a3e">🎟️ Discount (${appliedCoupon.code})</span>
+              <span style="color:#1a7a3e; font-weight:600">-$${discount.toFixed(2)}</span>
+            </div>
+          ` : ''}
+          <div style="display:flex; justify-content:space-between; margin-top:10px; padding-top:10px; border-top:2px solid var(--border);">
+            <span style="font-weight:800; font-size:16px;">Total</span>
+            <span style="font-weight:900; font-size:20px; color:var(--primary)">$${total.toFixed(2)}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    async function applyCoupon() {
+      const code = document.getElementById('coupon-input').value.trim();
+      const resultDiv = document.getElementById('coupon-result');
+      if (!code) return;
+
+      const cart = getCart();
+      const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+      const res = await apiCall('/api/coupons/validate', 'POST', { code, orderTotal: subtotal });
+
+      if (res.valid) {
+        appliedCoupon = res;
+        resultDiv.innerHTML = `<span style="color:#1a7a3e; font-weight:600;">✅ Coupon applied! You save $${res.discountAmount.toFixed(2)}</span>`;
+        showSummary();
+      } else {
+        appliedCoupon = null;
+        resultDiv.innerHTML = `<span style="color:var(--secondary); font-weight:600;">❌ ${res.message}</span>`;
+      }
+    }
+
+    async function placeOrder() {
+      const cart = getCart();
+      if (!cart.length) { window.location.href = '/cart.html'; return; }
+
+      const fullName = document.getElementById('fullName').value;
+      const address = document.getElementById('address').value;
+      const city = document.getElementById('city').value;
+      const phone = document.getElementById('phone').value;
+      const alertBox = document.getElementById('alert-box');
+
+      if (!fullName || !address || !city || !phone) {
+        alertBox.innerHTML = '<div class="alert alert-error">Please fill all fields</div>';
+        return;
+      }
+
+      const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const discount = appliedCoupon ? appliedCoupon.discountAmount : 0;
+      const total = subtotal - discount;
+
+      const orderData = {
+        items: cart.map(item => ({
+          product: item._id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          image: item.image
+        })),
+        totalPrice: parseFloat(total.toFixed(2)),
+        discountCode: appliedCoupon ? appliedCoupon.code : '',
+        discountAmount: discount,
+        shippingAddress: { fullName, address, city, phone }
+      };
+
+      const res = await apiCall('/api/orders', 'POST', orderData);
+
+      if (res._id) {
+        saveCart([]);
+        alertBox.innerHTML = '<div class="alert alert-success">🎉 Order placed successfully!</div>';
+        setTimeout(() => window.location.href = '/orders.html', 2000);
+      } else {
+        alertBox.innerHTML = `<div class="alert alert-error">${res.message}</div>`;
+      }
+    }
+
+    showSummary();
+  </script>
+</body>
+</html>

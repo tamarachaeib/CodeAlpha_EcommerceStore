@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Cinzel+Decorative:wght@700;900&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Orders - ShopZone</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    .tracking-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      position: relative;
+      margin: 25px 0 10px;
+      padding: 0 10px;
+    }
+    .tracking-bar::before {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: 30px; right: 30px;
+      height: 3px;
+      background: var(--border);
+      z-index: 0;
+    }
+    .tracking-progress {
+      position: absolute;
+      top: 20px;
+      left: 30px;
+      height: 3px;
+      background: linear-gradient(90deg, #6c63ff, #43e97b);
+      z-index: 1;
+      transition: width 0.6s ease;
+    }
+    .tracking-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      z-index: 2;
+      flex: 1;
+    }
+    .step-circle {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: #fff;
+      border: 3px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transition: all 0.4s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .step-circle.done {
+      border-color: #43e97b;
+      background: linear-gradient(135deg, #43e97b, #38f9d7);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(67,233,123,0.3);
+    }
+    .step-circle.active {
+      border-color: var(--primary);
+      background: var(--gradient);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(108,99,255,0.3);
+    }
+    .step-circle.cancelled {
+      border-color: var(--secondary);
+      background: var(--secondary);
+      color: #fff;
+    }
+    .step-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-light);
+      text-align: center;
+      line-height: 1.3;
+    }
+    .step-label.done { color: #1a7a3e; }
+    .step-label.active { color: var(--primary); }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-brand">🛍️ ShopZone</div>
+    <div class="nav-links">
+      <a href="/index.html">Home</a>
+      <a href="/products.html">Products</a>
+      <div class="nav-dropdown">
+        <a href="#" class="dropdown-toggle">Categories <i class="fas fa-chevron-down"></i></a>
+        <div class="dropdown-menu" id="nav-categories"></div>
+      </div>
+      <a href="/cart.html"><i class="fas fa-shopping-cart"></i> Cart <span id="cart-count">0</span></a>
+      <a href="/orders.html" id="nav-orders" style="display:none">My Orders</a>
+      <a href="/admin.html" id="nav-admin" style="display:none">⚙️ Admin</a>
+      <a href="/login.html" id="nav-login">Login</a>
+      <a href="#" id="nav-logout" style="display:none">Logout</a>
+      <span id="nav-username" style="color:#fff;margin-left:10px"></span>
+    </div>
+  </nav>
+
+  <div class="page-header">
+    <h1>My Orders</h1>
+  </div>
+
+  <div class="orders-container">
+    <div id="orders-list"></div>
+  </div>
+
+  <footer><p>© 2025 ShopZone. All rights reserved.</p></footer>
+
+  <script src="/js/main.js"></script>
+  <script src="/js/index.js"></script>
+  <script>
+    const user = getUser();
+    if (!user) window.location.href = '/login.html';
+
+    const steps = [
+      { key: 'pending', icon: '📋', label: 'Order Placed' },
+      { key: 'processing', icon: '⚙️', label: 'Processing' },
+      { key: 'shipped', icon: '🚚', label: 'Shipped' },
+      { key: 'delivered', icon: '✅', label: 'Delivered' }
+    ];
+
+    function getStepIndex(status) {
+      const map = { pending: 0, processing: 1, shipped: 2, delivered: 3, cancelled: -1 };
+      return map[status] ?? 0;
+    }
+
+    function renderTracking(status) {
+      if (status === 'cancelled') {
+        return `<div style="text-align:center; padding:15px; background:rgba(255,101,132,0.08); border-radius:12px; color:var(--secondary); font-weight:600;">
+          ❌ Order Cancelled
+        </div>`;
+      }
+
+      const currentIndex = getStepIndex(status);
+      const progressPercent = currentIndex === 0 ? 0 : (currentIndex / (steps.length - 1)) * 100;
+
+      return `
+        <div class="tracking-bar">
+          <div class="tracking-progress" style="width: calc(${progressPercent}% - 0px)"></div>
+          ${steps.map((step, i) => {
+            const isDone = i < currentIndex;
+            const isActive = i === currentIndex;
+            return `
+              <div class="tracking-step">
+                <div class="step-circle ${isDone ? 'done' : isActive ? 'active' : ''}">
+                  ${isDone ? '✓' : step.icon}
+                </div>
+                <div class="step-label ${isDone ? 'done' : isActive ? 'active' : ''}">
+                  ${step.label}
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    async function loadOrders() {
+      const container = document.getElementById('orders-list');
+      container.innerHTML = '<div class="loading">Loading orders...</div>';
+
+      try {
+        const orders = await apiCall('/api/orders/myorders');
+
+        if (!orders.length) {
+          container.innerHTML = `
+            <div class="empty">
+              <i class="fas fa-box-open"></i>
+              <p>No orders yet</p>
+              <a href="/products.html" class="btn-primary" style="margin-top:20px">Start Shopping</a>
+            </div>`;
+          return;
+        }
+
+        container.innerHTML = orders.map(order => `
+          <div class="order-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+              <h3 style="font-size:17px; font-weight:800;">Order #${order._id.slice(-6).toUpperCase()}</h3>
+              <span class="status-badge status-${order.status}">${order.status}</span>
+            </div>
+            <div style="font-size:13px; color:var(--text-light); margin-bottom:15px;">
+              📅 ${new Date(order.createdAt).toLocaleDateString()}
+            </div>
+
+            ${renderTracking(order.status)}
+
+            <div style="margin:20px 0;">
+              ${order.items.map(item => `
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px; padding:12px; background:#f8f9ff; border-radius:12px;">
+                  <img src="${item.image}" style="width:50px;height:50px;object-fit:cover;border-radius:10px;"
+                    onerror="this.src='https://via.placeholder.com/50?text=No'"/>
+                  <div style="flex:1">
+                    <div style="font-weight:700; font-size:14px; color:var(--dark2)">${item.name}</div>
+                    <div style="font-size:12px; color:var(--text-light)">Qty: ${item.quantity} · $${item.price.toFixed(2)} each</div>
+                  </div>
+                  <div style="font-weight:700; color:var(--primary)">$${(item.price * item.quantity).toFixed(2)}</div>
+                </div>
+              `).join('')}
+            </div>
+
+            <div style="background:#f8f9ff; border-radius:12px; padding:15px;">
+              <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                <span style="color:var(--text-light); font-size:13px;">📦 Ship to</span>
+                <span style="font-size:13px; font-weight:600;">${order.shippingAddress?.fullName}, ${order.shippingAddress?.city}</span>
+              </div>
+              ${order.discountAmount > 0 ? `
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                  <span style="color:#1a7a3e; font-size:13px;">🎟️ Discount (${order.discountCode})</span>
+                  <span style="color:#1a7a3e; font-weight:600; font-size:13px;">-$${order.discountAmount.toFixed(2)}</span>
+                </div>
+              ` : ''}
+              <div style="display:flex; justify-content:space-between; padding-top:10px; border-top:2px solid var(--border);">
+                <span style="font-weight:800;">Total</span>
+                <span style="font-weight:900; font-size:18px; color:var(--primary)">$${order.totalPrice.toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+        `).join('');
+
+      } catch (error) {
+        container.innerHTML = '<div class="empty"><p>Error loading orders</p></div>';
+      }
+    }
+
+    loadOrders();
+  </script>
+</body>
+</html>

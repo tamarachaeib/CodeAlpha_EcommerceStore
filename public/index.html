@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ShopZone</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-brand">🛍️ ShopZone</div>
+    <div class="nav-links">
+      <a href="/index.html">Home</a>
+      <a href="/products.html">Products</a>
+      <div class="nav-dropdown">
+        <a href="#" class="dropdown-toggle">Categories <i class="fas fa-chevron-down"></i></a>
+        <div class="dropdown-menu" id="nav-categories"></div>
+      </div>
+      <a href="/cart.html"><i class="fas fa-shopping-cart"></i> Cart <span id="cart-count">0</span></a>
+      <a href="/orders.html" id="nav-orders" style="display:none">My Orders</a>
+      <a href="/admin.html" id="nav-admin" style="display:none">⚙️ Admin</a>
+      <a href="/login.html" id="nav-login">Login</a>
+      <a href="#" id="nav-logout" style="display:none">Logout</a>
+      <span id="nav-username" style="color:#fff;margin-left:10px"></span>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Welcome to ShopZone</h1>
+      <p>Discover amazing products at unbeatable prices</p>
+      <a href="/products.html" class="btn-primary">Shop Now</a>
+    </div>
+  </section>
+
+  <!-- Best Sellers -->
+  <section class="featured">
+    <h2>⭐ Best Sellers</h2>
+    <p class="subtitle">Our most loved products</p>
+    <div class="products-grid" id="best-sellers"></div>
+    <div style="text-align:center; margin-top:40px">
+      <a href="/products.html" class="btn-primary">View All Products</a>
+    </div>
+  </section>
+
+  <!-- Categories -->
+  <section class="categories-section">
+    <h2>Shop by Category</h2>
+    <p class="subtitle">Find what you're looking for</p>
+    <div class="categories-grid" id="home-categories"></div>
+  </section>
+
+  <footer>
+    <p>© 2025 ShopZone. All rights reserved.</p>
+  </footer>
+
+  <script src="/js/main.js"></script>
+  <script src="/js/index.js"></script>
+</body>
+</html>
